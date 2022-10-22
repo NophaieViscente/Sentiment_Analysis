@@ -10,7 +10,7 @@ class PlotData :
     def __init__(self, processor_data=ProcessData()) -> None:
         self.processor = processor_data
 
-    def plotting_target_balance(
+    def plot_target_balance(
         self, 
         data:pd.DataFrame,
         column_target:str,
@@ -23,7 +23,7 @@ class PlotData :
 
         return plt.show()
     
-    def plotting_num_char_per_text(
+    def plot_num_char_per_text(
         self, data:pd.DataFrame,
         column_text:str)->plt :
 
@@ -34,7 +34,7 @@ class PlotData :
         plt.title("Number of Characters")
         plt.show()
     
-    def plotting_number_of_words(
+    def plot_number_of_words(
         self, data:pd.DataFrame,
         column_text:str)->plt :
 
@@ -63,3 +63,13 @@ class PlotData :
         plt.imshow(wc)
         plt.axis('off')
         plt.show()
+        
+    def plot_count_sentences(
+        self, data:pd.DataFrame,
+        column_sentence:str,
+        display_most_appear:int=20)->sns:
+
+        chains= data[column_sentence].value_counts()[:display_most_appear]
+        sns.barplot(x=chains,y=chains.index,palette='deep')
+        plt.title(f"Top {display_most_appear} Keywords")
+        plt.xlabel("Count of Keywords")
