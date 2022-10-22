@@ -166,7 +166,7 @@ class ProcessData :
         text = self.remove_stopwords(text)
         text = self.remove_numbers(text)
         text = self.remove_punctuation(text)
-
+        text = self.remove_stopwords(text)
         dataframe[column_to_clean] = text
 
         return dataframe
