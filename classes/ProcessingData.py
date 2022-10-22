@@ -89,6 +89,14 @@ class ProcessData :
         data_cleaned = data.apply(lambda x: url_chars.sub(r'',x))
 
         return data_cleaned
+
+    def remove_HTMLs (
+        self, data:pd.Series)->pd.Series :
+
+        html_tags = re.compile(r'<.*?>')
+        data_cleaned = data.apply(lambda txt: html_tags.sub(r'',txt))
+
+        return data_cleaned
     
     def clean_non_ascii_chars(
         self, data:pd.Series)->pd.Series:
@@ -109,17 +117,26 @@ class ProcessData :
             u"\U00002702-\U000027B0"
             u"\U000024C2-\U0001F251"
             "]+", flags=re.UNICODE)
-        data_cleaned = data.apply(lambda txt: emoji_codes.sub(r'',txt))
+        data_cleaned = data.apply(lambda txt: emoji_codes.sub(r'EMOJI',txt))
 
         return data_cleaned
     
-    def remove_HTMLs (
-        self, data:pd.Series)->pd.Series :
+    def remove_mention(
+        self, data:pd.Series)->pd.Series:
 
-        html_tags = re.compile(r'<.*?>')
-        data_cleaned = data.apply(lambda txt: html_tags.sub(r'',txt))
+        mention = re.compile(r'@\S+')
+        data_cleaned = data.apply(lambda txt: mention.sub(r' USER ', txt))
 
         return data_cleaned
+    
+    def remove_numbers(
+        self, data:pd.Series)->pd.Series:
+        
+        number = re.compile(r'[-+]?[.\d]*[\d]+[:,.\d]*')
+        data_cleaned = data.apply(lambda txt: number.sub(r' NUMBER ', txt))
+
+        return data_cleaned
+    
 
     def remove_punctuation(
         self, data:pd.Series,
@@ -135,3 +152,22 @@ class ProcessData :
 
         data_cleaned = data.apply(lambda txt: ' '.join([x for x in txt.split() if x not in self.stopwords]))
         return data_cleaned
+    
+    def clean_whole_text(
+        self, data:pd.DataFrame,
+        column_to_clean:str)->pd.DataFrame :
+
+        dataframe = data.copy()
+        text = self.remove_URLs(dataframe[column_to_clean])
+        text = self.remove_HTMLs(text)
+        text = self.clean_non_ascii_chars(text)
+        text = self.remove_emojis(text)
+        text = self.remove_mention(text)
+        text = self.remove_stopwords(text)
+        text = self.remove_numbers(text)
+        text = self.remove_punctuation(text)
+
+        dataframe[column_to_clean] = text
+
+        return dataframe
+
