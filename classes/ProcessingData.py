@@ -1,6 +1,6 @@
 import pandas as pd
 import re
-from collections import defaultdict
+from collections import defaultdict, Counter
 from nltk.corpus import stopwords
 import string
 
@@ -117,7 +117,7 @@ class ProcessData :
             u"\U00002702-\U000027B0"
             u"\U000024C2-\U0001F251"
             "]+", flags=re.UNICODE)
-        data_cleaned = data.apply(lambda txt: emoji_codes.sub(r'EMOJI',txt))
+        data_cleaned = data.apply(lambda txt: emoji_codes.sub(r'',txt))
 
         return data_cleaned
     
@@ -125,7 +125,7 @@ class ProcessData :
         self, data:pd.Series)->pd.Series:
 
         mention = re.compile(r'@\S+')
-        data_cleaned = data.apply(lambda txt: mention.sub(r' USER ', txt))
+        data_cleaned = data.apply(lambda txt: mention.sub(r'', txt))
 
         return data_cleaned
     
@@ -133,7 +133,7 @@ class ProcessData :
         self, data:pd.Series)->pd.Series:
         
         number = re.compile(r'[-+]?[.\d]*[\d]+[:,.\d]*')
-        data_cleaned = data.apply(lambda txt: number.sub(r' NUMBER ', txt))
+        data_cleaned = data.apply(lambda txt: number.sub(r'', txt))
 
         return data_cleaned
     
@@ -170,4 +170,18 @@ class ProcessData :
         dataframe[column_to_clean] = text
 
         return dataframe
+    
+    def count_most_common_terms(
+        self, corpus:list) :
+
+        counter = Counter(corpus)
+        most_common = counter.most_common()
+
+        words = list()
+        counts = list()
+        for word, count in most_common :
+            words.append(word)
+            counts.append(count)
+        
+        return words, counts
 
